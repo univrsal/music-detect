@@ -33,6 +33,11 @@ set_property(TARGET ${CMAKE_PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 find_package(libobs REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::libobs)
 
+# the audio util headers aren't exported on macos so this might help?
+if (APPLE)
+  target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include)
+endif()
+
 string(TIMESTAMP TODAY "%Y.%m.%d %H:%M")
 
 # Get the current working branch

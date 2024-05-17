@@ -16,7 +16,7 @@
 !LICENSE
 !README.md
 !deps
-
+!include/
 deps/*
 
 # Exclude lock files
