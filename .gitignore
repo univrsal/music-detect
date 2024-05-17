@@ -15,6 +15,9 @@
 !CMakePresets.json
 !LICENSE
 !README.md
+!deps
+
+deps/*
 
 # Exclude lock files
 *.lock.json

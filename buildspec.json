@@ -36,13 +36,13 @@
             "bundleId": "com.example.obs-plugintemplate"
         }
     },
-    "name": "obs-plugintemplate",
-    "displayName": "OBS Plugin Template",
+    "name": "music-detect",
+    "displayName": "Audio filter that detects music to mute the source",
     "version": "1.0.0",
-    "author": "Your Name Here",
-    "website": "https://example.com",
-    "email": "me@example.com",
+    "author": "univrsal",
+    "website": "https://vrsal.cc",
+    "email": "uni@vrsal.xyz",
     "uuids": {
-        "windowsApp": "00000000-0000-0000-0000-000000000000"
+        "windowsApp": "ff7e3628-bf9a-45a2-a8d1-8194f260f1bc"
     }
 }

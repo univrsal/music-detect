@@ -1,8 +1,15 @@
 cmake_minimum_required(VERSION 3.16...3.26)
 
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/common/bootstrap.cmake" NO_POLICY_SCOPE)
 
-project(${_name} VERSION ${_version})
+project(${_name} VERSION ${_version} LANGUAGES CXX C)
+
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindLibTorch.cmake" NO_POLICY_SCOPE)
+
+
 
 option(ENABLE_FRONTEND_API "Use obs-frontend-api for UI functionality" OFF)
 option(ENABLE_QT "Use Qt functionality" OFF)
@@ -11,10 +18,44 @@ include(compilerconfig)
 include(defaults)
 include(helpers)
 
+#link_directories(${TORCH_LIB_DIR})
+
 add_library(${CMAKE_PROJECT_NAME} MODULE)
+
+# set_target_properties(${PROJECT_NAME}
+#     PROPERTIES
+#         INSTALL_RPATH "."
+# )
+
+target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC ${TORCH_LIBRARIES})
+set_property(TARGET ${CMAKE_PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 
 find_package(libobs REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::libobs)
+
+string(TIMESTAMP TODAY "%Y.%m.%d %H:%M")
+
+# Get the current working branch
+execute_process(
+    COMMAND git rev-parse --abbrev-ref HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_BRANCH
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+# Get the latest commit hash
+execute_process(
+    COMMAND git rev-parse --short HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_COMMIT_HASH
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+target_compile_definitions(${PROJECT_NAME} PUBLIC
+    GIT_BRANCH="${GIT_BRANCH}"
+    GIT_COMMIT_HASH="${GIT_COMMIT_HASH}"
+    PLUGIN_VERSION="${_version}"
+    BUILD_TIME="${TODAY}"
+)
+
 
 if(ENABLE_FRONTEND_API)
   find_package(obs-frontend-api REQUIRED)
@@ -34,6 +75,6 @@ if(ENABLE_QT)
                AUTORCC ON)
 endif()
 
-target_sources(${CMAKE_PROJECT_NAME} PRIVATE src/plugin-main.c)
+target_sources(${CMAKE_PROJECT_NAME} PRIVATE src/plugin-main.cpp src/network.cpp src/labels.cpp src/inference.cpp src/music-filter.cpp)
 
 set_target_properties_plugin(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME ${_name})
