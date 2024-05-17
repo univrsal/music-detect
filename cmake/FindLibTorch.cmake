@@ -6,7 +6,7 @@ else()
     set(TORCH_BUILD_TYPE "debug")
 endif()
 
-if (WIN23)
+if (WIN32)
     set(LIBTORCH_VERSION "2.1.0") # 2.3.0 crashes, cool
 else()
     set(LIBTORCH_VERSION "2.3.0")
