@@ -38,11 +38,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #define T_CONFIDENCE_THRESHOLD  T_("confidencethreshold")
 #define T_SMOOTHING             T_("smoothing")
 #define T_CONFIDENCE_INFO       T_("confidenceinfo")
+#define T_LOG                   T_("log")
 
 #define S_WINDOW_SIZE           "window_size"
 #define S_CLASS_TO_IDENTIFY     "target_class"
 #define S_CONFIDENCE_THRESHOLD  "confidence_threshold"
 #define S_SMOOTHING             "smoothing"
+#define S_LOG                   "log"
 
 struct music_filter_data {
     obs_source_t* context{};
@@ -57,6 +59,7 @@ struct music_filter_data {
     float smoothing{};
     float new_confidence{};
     float current_confidence{};
+    bool log_confidence {};
 };
 
 static const char* mf_name(void*)
@@ -82,6 +85,7 @@ static void mf_update(void* data, obs_data_t* s)
     filter->target_class = obs_data_get_string(s, S_CLASS_TO_IDENTIFY);
     filter->threshold = (float) obs_data_get_double(s, S_CONFIDENCE_THRESHOLD);
     filter->smoothing = (float) obs_data_get_double(s, S_SMOOTHING);
+    filter->log_confidence = obs_data_get_bool(s, S_LOG);
 }
 
 static void* mf_create(obs_data_t* settings, obs_source_t* filter)
@@ -124,6 +128,12 @@ static struct obs_audio_data* mf_filter_audio(void* data,
         return audio;
     }
 
+    // low-pass filter for confidences smoothing
+    filter->current_confidence = filter->current_confidence * (1.f - filter->smoothing) + filter->new_confidence * filter->smoothing;
+    auto* src = obs_filter_get_target(filter->context);
+    if (src)
+        obs_source_set_muted(src, filter->current_confidence > filter->threshold);
+
     if (audio->frames <= 0) {
         return audio;
     }
@@ -159,19 +169,17 @@ static struct obs_audio_data* mf_filter_audio(void* data,
         if (get_inference_result(filter->current_inference_job_id,
                 &result)) {
             filter->current_inference_job_id = -1;
+            if (filter->log_confidence)
+                binfo("==== results ====");
             for (int i = 0; i < 10; i++) {
                 if (result.labels[i] == filter->target_class)
                     filter->new_confidence = result.confidences[i];
+                if (filter->log_confidence) {
+                    binfo(" - %s: %f", result.labels[i], result.confidences[i]);
+                }
             }
-
-            auto* src = obs_filter_get_target(filter->context);
-            if (src)
-                obs_source_set_muted(src, filter->current_confidence > filter->threshold);
         }
     }
-
-    // low-pass filter for confidences smoothing
-    filter->current_confidence = filter->current_confidence * (1.f - filter->smoothing) + filter->new_confidence * filter->smoothing;
     return audio;
 }
 
@@ -181,7 +189,7 @@ static obs_properties_t* mf_properties(void* data)
     auto* props = obs_properties_create();
 
     obs_properties_add_text(props, S_CLASS_TO_IDENTIFY, T_CLASS_TO_IDENTIFY, OBS_TEXT_DEFAULT);
-    obs_properties_add_text(props, "infotext", "<a href=\"https://github.com/univrsal/music-detect/blob/master/src/classes.cpp\">List of classes</a>", OBS_TEXT_INFO);
+    obs_properties_add_text(props, "infotext", "<a href=\"https://github.com/univrsal/music-detect/blob/master/src/labels.cpp\">List of classes</a>", OBS_TEXT_INFO);
 
     auto threshold = obs_properties_add_float(props, S_CONFIDENCE_THRESHOLD, T_CONFIDENCE_THRESHOLD, 0.01, 1.0, 0.01);
     obs_property_set_long_description(threshold, T_CONFIDENCE_INFO);
@@ -193,7 +201,8 @@ static obs_properties_t* mf_properties(void* data)
     obs_property_int_set_suffix(threshold, " %");
 
     obs_properties_add_text(props, "infotext2", "Plugin by <a href=\"https://vrsal.cc/donate\">univrsal</a>, using <a href=\"https://pytorch.org\">libtorch</a> and <a href=\"https://github.com/qiuqiangkong/audioset_tagging_cnn\">PANNs</a>", OBS_TEXT_INFO);
-
+    
+    obs_properties_add_bool(props, S_LOG, T_LOG);
     return props;
 }
 
