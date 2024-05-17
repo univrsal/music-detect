@@ -71,7 +71,7 @@ void Network::inference_thread_method()
             idx = idx.flip({ 0 });
         
             InferenceResult result;
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 50; i++) {
                 result.labels[i] = g_lables[(size_t)idx[i].item<int>()].c_str();
                 result.confidences[i] = output_a[idx[i].item<int>()];
             }

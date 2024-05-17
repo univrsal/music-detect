@@ -20,8 +20,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <stdbool.h>
 
 struct InferenceResult {
-    const char* labels[10];
-    float confidences[10];
+    const char* labels[50];
+    float confidences[50];
 };
 
 extern int run_inference(float* frames, int count);

@@ -173,10 +173,11 @@ static struct obs_audio_data* mf_filter_audio(void* data,
                 binfo("Current confidence: %f, new confidence: %f", filter->current_confidence, filter->new_confidence);
                 binfo("==== results ====");
             }
-            for (int i = 0; i < 10; i++) {
+            filter->new_confidence = 0.f; // default in case the class is not in the top fifty
+            for (int i = 0; i < 50; i++) {
                 if (result.labels[i] == filter->target_class)
                     filter->new_confidence = result.confidences[i];
-                if (filter->log_confidence) {
+                if (filter->log_confidence && i < 10) {
                     binfo(" - %s: %f", result.labels[i], result.confidences[i]);
                 }
             }
