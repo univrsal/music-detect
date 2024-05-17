@@ -38,3 +38,9 @@ if(NOT Torch_FOUND)
 else()
     message(STATUS "libtorch found")
 endif()
+
+# get all .dll files in ${CMAKE_BINARY_DIR}/libtorch/lib
+file(GLOB TORCH_DLLS "${CMAKE_BINARY_DIR}/libtorch/lib/*.dll")
+
+# install the dll files to the binary directory for taregt "test"
+install(FILES ${TORCH_DLLS} DESTINATION obs-plugins/64bit)
