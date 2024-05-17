@@ -25,7 +25,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "inference.hpp"
 
 class Network {
-    torch::jit::Module m_model;
+    torch::jit::Module m_model {};
     bool m_loaded = false;
 
     std::thread m_inference_thread;

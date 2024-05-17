@@ -61,19 +61,19 @@ void Network::inference_thread_method()
         m_mutex.unlock();
 
         try {
-            auto outputs = m_model.forward({ data }).toTuple();
-            auto output = outputs->elements().at(0).toTensor().cpu().contiguous().to(torch::kFloat32)[0];
+            auto outputss = m_model.forward({ data });
+            auto outputs = outputss.toTuple();
+            auto output = outputs->elements().at(0).toTensor().cpu().detach().contiguous().to(torch::kFloat32)[0];
             auto output_a = output.accessor<float, 1>();
             auto sorted = output.sort(0);
 
             auto idx = std::get<1>(sorted);
             idx = idx.flip({ 0 });
-            auto i_a = idx.accessor<int, 1>();
-
+        
             InferenceResult result;
             for (int i = 0; i < 10; i++) {
-                result.labels[i] = g_lables[(size_t)i_a[i]].c_str();
-                result.confidences[i] = output_a[i_a[i]];
+                result.labels[i] = g_lables[(size_t)idx[i].item<int>()].c_str();
+                result.confidences[i] = output_a[idx[i].item<int>()];
             }
 
             m_inference_results[job_id] = result;

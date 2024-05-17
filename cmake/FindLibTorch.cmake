@@ -6,7 +6,12 @@ else()
     set(TORCH_BUILD_TYPE "debug")
 endif()
 
-set(LIBTORCH_VERSION "2.3.0")
+if (WIN23)
+    set(LIBTORCH_VERSION "2.1.0") # 2.3.0 crashes, cool
+else()
+    set(LIBTORCH_VERSION "2.3.0")
+endif()
+
 if (WIN32)
     if(CMAKE_BUILD_TYPE MATCHES Debug)
         set(TORCH_URL "https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-debug-${LIBTORCH_VERSION}%2Bcpu.zip")
