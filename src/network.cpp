@@ -124,3 +124,4 @@ bool Network::get_result(int job_id, InferenceResult& result)
     result = it->second;
     return true;
 }
+

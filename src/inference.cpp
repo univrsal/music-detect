@@ -29,3 +29,4 @@ bool get_inference_result(int job_id, InferenceResult* result)
 {
     return g_network->get_result(job_id, *result);
 }
+

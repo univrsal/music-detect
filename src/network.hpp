@@ -48,3 +48,4 @@ public:
 };
 
 extern Network* g_network;
+

@@ -210,3 +210,4 @@ struct obs_source_info music_filter = {
     .update = mf_update,
     .filter_audio = mf_filter_audio,
 };
+

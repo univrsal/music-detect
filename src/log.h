@@ -34,3 +34,4 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #define binfo(format, ...) write_log(LOG_INFO, format, ##__VA_ARGS__)
 #define bwarn(format, ...) write_log(LOG_WARNING, format, ##__VA_ARGS__)
 #define berr(format, ...) write_log(LOG_ERROR, format, ##__VA_ARGS__)
+

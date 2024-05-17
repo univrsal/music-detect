@@ -19,3 +19,4 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <obs-module.h>
 
 extern struct obs_source_info music_filter;
+

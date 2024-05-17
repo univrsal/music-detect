@@ -27,3 +27,4 @@ struct InferenceResult {
 extern int run_inference(float* frames, int count);
 
 extern bool get_inference_result(int job_id, struct InferenceResult* result);
+

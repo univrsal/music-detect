@@ -44,3 +44,4 @@ void obs_module_unload(void)
     g_network = nullptr;
     binfo("plugin unloaded");
 }
+
