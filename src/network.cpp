@@ -19,8 +19,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "network.hpp"
 
 #include <obs-module.h>
-#include <obs/util/util.hpp>
 
+#if defined(__APPLE__) || defined(_WIN32)
+#include <util/util.hpp>
+#else
+#include <obs/util/util.hpp>
+#endif
 #include "labels.hpp"
 #include "log.h"
 
@@ -64,7 +68,7 @@ void Network::inference_thread_method()
 
             auto idx = std::get<1>(sorted);
             idx = idx.flip({ 0 });
-            auto i_a = idx.accessor<long, 1>();
+            auto i_a = idx.accessor<int, 1>();
 
             InferenceResult result;
             for (int i = 0; i < 10; i++) {

@@ -17,9 +17,16 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 */
 #include "music-filter.hpp"
 
+#if defined(__APPLE__) || defined(_WIN32)
+#include <media-io/audio-resampler.h>
+#include <util/deque.h>
+#include <util/platform.h>
+#else
 #include <obs/media-io/audio-resampler.h>
 #include <obs/util/deque.h>
 #include <obs/util/platform.h>
+#endif
+
 #include <string>
 
 #include "inference.hpp"

@@ -1,15 +1,12 @@
 cmake_minimum_required(VERSION 3.16...3.26)
 
+set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/common/bootstrap.cmake" NO_POLICY_SCOPE)
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/common/bootstrap.cmake" NO_POLICY_SCOPE)
-
-project(${_name} VERSION ${_version} LANGUAGES CXX C)
-
-include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindLibTorch.cmake" NO_POLICY_SCOPE)
-
-
+project(${_name} VERSION ${_version})
 
 option(ENABLE_FRONTEND_API "Use obs-frontend-api for UI functionality" OFF)
 option(ENABLE_QT "Use Qt functionality" OFF)
@@ -18,26 +15,10 @@ include(compilerconfig)
 include(defaults)
 include(helpers)
 
-#link_directories(${TORCH_LIB_DIR})
-
 add_library(${CMAKE_PROJECT_NAME} MODULE)
-
-# set_target_properties(${PROJECT_NAME}
-#     PROPERTIES
-#         INSTALL_RPATH "."
-# )
-
+set_property(TARGET ${CMAKE_PROJECT_NAME} PROPERTY CXX_STANDARD 20)
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindLibTorch.cmake")
 target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC ${TORCH_LIBRARIES})
-set_property(TARGET ${CMAKE_PROJECT_NAME} PROPERTY CXX_STANDARD 17)
-
-find_package(libobs REQUIRED)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::libobs)
-
-# the audio util headers aren't exported on macos so this might help?
-if (APPLE)
-  target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include)
-endif()
-
 string(TIMESTAMP TODAY "%Y.%m.%d %H:%M")
 
 # Get the current working branch
@@ -61,6 +42,8 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
     BUILD_TIME="${TODAY}"
 )
 
+find_package(libobs REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::libobs)
 
 if(ENABLE_FRONTEND_API)
   find_package(obs-frontend-api REQUIRED)
