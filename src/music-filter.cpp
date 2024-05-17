@@ -169,8 +169,10 @@ static struct obs_audio_data* mf_filter_audio(void* data,
         if (get_inference_result(filter->current_inference_job_id,
                 &result)) {
             filter->current_inference_job_id = -1;
-            if (filter->log_confidence)
+            if (filter->log_confidence) {
+                binfo("Current confidence: %f, new confidence: %f", filter->current_confidence, filter->new_confidence);
                 binfo("==== results ====");
+            }
             for (int i = 0; i < 10; i++) {
                 if (result.labels[i] == filter->target_class)
                     filter->new_confidence = result.confidences[i];
@@ -178,6 +180,7 @@ static struct obs_audio_data* mf_filter_audio(void* data,
                     binfo(" - %s: %f", result.labels[i], result.confidences[i]);
                 }
             }
+
         }
     }
     return audio;
