@@ -42,6 +42,9 @@ Network::~Network()
 
 void Network::inference_thread_method()
 {
+    torch::NoGradGuard no_grad;
+    m_model.eval();
+
     while (true) {
         m_mutex.lock();
         if (!m_thread_running) {
