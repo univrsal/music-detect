@@ -219,7 +219,7 @@ static void mf_defaults(obs_data_t* s)
 }
 
 struct obs_source_info music_filter = {
-    .id = "muted_filter",
+    .id = "music_filter",
     .type = OBS_SOURCE_TYPE_FILTER,
     .output_flags = OBS_SOURCE_AUDIO,
     .get_name = mf_name,
